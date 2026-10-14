@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Your Water Usage Results</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chart Data Labels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f8fc;
+            margin: 0;
+            padding: 20px;
+            color: #243746;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #176b87;
+        }
+
+        h2 {
+            color: #176b87;
+            margin-top: 35px;
+        }
+
+        .summary {
+            background: #e6f5fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+            .summary strong {
+                font-size: 24px;
+                color: #176b87;
+            }
+
+        .comparison {
+            background: #f1f8fc;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.7;
+        }
+
+        .less {
+            color: #16834a;
+            font-weight: bold;
+        }
+
+        .more {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .equal {
+            color: #176b87;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #dceff5;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            margin: 25px auto;
+        }
+
+        .pie-container {
+            height: 400px;
+        }
+
+        /* Water Saving Recommendations */
+
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tip {
+            background-color: #f1f8fc;
+            border-left: 5px solid #176b87;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+            .tip h3 {
+                color: #176b87;
+                margin-top: 0;
+            }
+
+            .tip p {
+                line-height: 1.6;
+                margin-bottom: 0;
+            }
+
+        .button {
+            display: block;
+            text-align: center;
+            background: #176b87;
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 30px;
+        }
+
+            .button:hover {
+                background: #12536a;
+            }
+
+        /* layout */
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 400px;
+            }
+
+            .pie-container {
+                height: 350px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Your Water Usage Results</h1>
+
+        <!-- Final Results -->
+
+        <div class="summary">
+
+            <h2>Total Water Use Per Week</h2>
+            <strong>{{ weekly_total }} L</strong>
+
+            <h2>Average Water Use Per Day</h2>
+            <strong>{{ daily_average }} L/day</strong>
+
+        </div>
+
+
+        <!-- Comparison -->
+
+        <h2>How Does Your Water Usage Compare?</h2>
+
+        <div class="comparison">
+
+            <p>
+                The residential water consumption benchmark
+                used for Metro Vancouver is approximately
+                <strong>{{ metro_average }} litres per person per day</strong>.
+            </p>
+
+            {% if comparison == "less" %}
+
+            <p>
+                Your estimated daily water usage is
+                <strong>{{ daily_average }} L/day</strong>.
+            </p>
+
+            <p class="less">
+                You use approximately {{ difference }} litres
+                LESS water per day than the benchmark.
+            </p>
+
+            <p>
+                That is approximately
+                <strong>{{ percentage_difference }}% less</strong>
+                than the benchmark.
+            </p>
+
+            {% elif comparison == "more" %}
+
+            <p>
+                Your estimated daily water usage is
+                <strong>{{ daily_average }} L/day</strong>.
+            </p>
+
+            <p class="more">
+                You use approximately {{ difference }} litres
+                MORE water per day than the benchmark.
+            </p>
+
+            <p>
+                That is approximately
+                <strong>{{ percentage_difference }}% more</strong>
+                than the benchmark.
+            </p>
+
+            {% else %}
+
+            <p class="equal">
+                Your estimated daily water usage is
+                {{ daily_average }} L/day,
+                which is equal to the benchmark.
+            </p>
+
+            {% endif %}
+
+            <p>
+                <small>
+                    Note: This calculator estimates selected
+                    household activities and may not include
+                    all residential water uses.
+                </small>
+            </p>
+
+        </div>
+
+
+        <!-- Weekly Breakdown -->
+
+        <h2>Weekly Water Usage Breakdown</h2>
+
+        <table>
+
+            <tr>
+                <th>Category</th>
+                <th>Water Used (L/week)</th>
+            </tr>
+
+            <tr>
+                <td>Toilet Flushes</td>
+                <td>{{ toilet }}</td>
+            </tr>
+
+            <tr>
+                <td>Shower & Brushing Teeth</td>
+                <td>{{ shower_brushing }}</td>
+            </tr>
+
+            <tr>
+                <td>Laundry</td>
+                <td>{{ laundry }}</td>
+            </tr>
+
+            <tr>
+                <td>Cooking & Dishwashing</td>
+                <td>{{ cooking }}</td>
+            </tr>
+
+            <tr>
+                <td>Drinking Water</td>
+                <td>{{ drinking }}</td>
+            </tr>
+
+        </table>
+
+
+        <!-- Bar Graph -->
+
+        <h2>Percentage of Water Usage by Category</h2>
+
+        <div class="chart-container">
+            <canvas id="barChart"></canvas>
+        </div>
+
+
+        <!-- Pie Chart -->
+
+        <h2>Water Usage Distribution</h2>
+
+        <div class="chart-container pie-container">
+            <canvas id="pieChart"></canvas>
+        </div>
+
+
+        <!-- Water Saving Recommendations -->
+
+        <h2>8 Ways to Reduce Your Water Usage</h2>
+
+        <p>
+            Here are some practical ways to reduce your
+            daily water consumption and help conserve water
+            in Metro Vancouver.
+        </p>
+
+        <div class="recommendations">
+
+            <div class="tip">
+                <h3>1. Take Shorter Showers</h3>
+                <p>
+                    Reduce shower time from 20 minutes to 15 minutes.
+                    Install a water-efficient showerhead to reduce
+                    water consumption further.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>2. Turn Off Taps When Not in Use</h3>
+                <p>
+                    Turn off the faucet while brushing your teeth,
+                    shaving, or washing your face instead of
+                    leaving water running.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>3. Use Water-Efficient Toilets</h3>
+                <p>
+                    Install dual-flush or low-flow toilets
+                    and avoid unnecessary flushing.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>4. Wash Full Loads of Laundry</h3>
+                <p>
+                    Run the washing machine only when you have
+                    a full load, or use the appropriate water-level
+                    setting for smaller loads.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>5. Save Water While Washing Dishes</h3>
+                <p>
+                    Run the dishwasher with full loads.
+                    When washing by hand, fill the sink with
+                    water instead of continuously running the tap.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>6. Fix Leaking Faucets and Toilets</h3>
+                <p>
+                    Check for dripping taps, running toilets,
+                    and leaking pipes. Repairing leaks prevents
+                    unnecessary water waste.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>7. Collect Rainwater for Gardening</h3>
+                <p>
+                    Use a rain barrel to collect rainwater
+                    for watering outdoor plants instead of
+                    using treated drinking water.
+                </p>
+            </div>
+
+            <div class="tip">
+                <h3>8. Reduce Outdoor Watering</h3>
+                <p>
+                    Use drought-tolerant plants, mulch,
+                    and drip irrigation. Follow Metro Vancouver's
+                    seasonal lawn-watering restrictions.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Calculate Again -->
+
+        <a href="/" class="button">
+            Calculate Again
+        </a>
+
+    </div>
+
+
+    <!-- JavaScript Charts -->
+
+    <script>
+
+    // Category names
+    const categories = [
+        "Toilet",
+        "Shower & Brushing",
+        "Laundry",
+        "Cooking & Dishwashing",
+        "Drinking"
+    ];
+
+    // Weekly water usage from Python
+    const waterData = [
+        {{ toilet | tojson }},
+        {{ shower_brushing | tojson }},
+        {{ laundry | tojson }},
+        {{ cooking | tojson }},
+        {{ drinking | tojson }}
+    ];
+
+    // Total water usage
+    const totalWater = waterData.reduce(
+        (total, value) => total + value,
+        0
+    );
+
+    // Percentage of each category
+    const percentageData = waterData.map(
+        value => totalWater > 0
+            ? (value / totalWater) * 100
+            : 0
+    );
+
+    // Register chart labels plugin
+    if (typeof ChartDataLabels !== "undefined") {
+        Chart.register(ChartDataLabels);
+    }
+
+    // Bar graph
+    new Chart(
+        document.getElementById("barChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: categories,
+
+                datasets: [{
+                    label: "Water Usage (%)",
+                    data: percentageData,
+                    backgroundColor: [
+                        "#3498db",
+                        "#1abc9c",
+                        "#f39c12",
+                        "#9b59b6",
+                        "#e74c3c"
+                    ]
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                layout: {
+                    padding: {
+                        top: 25
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+
+                        title: {
+                            display: true,
+                            text: "Percentage (%)"
+                        },
+
+                        ticks: {
+                            callback: value => value + "%"
+                        }
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    datalabels: {
+                        display: true,
+                        anchor: "end",
+                        align: "end",
+                        formatter: value =>
+                            value.toFixed(1) + "%",
+                        font: {
+                            weight: "bold"
+                        }
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: context =>
+                                context.raw.toFixed(1) + "%"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    // Pie Chart
+    new Chart(
+        document.getElementById("pieChart"),
+        {
+            type: "pie",
+
+            data: {
+                labels: categories,
+
+                datasets: [{
+                    data: percentageData,
+
+                    backgroundColor: [
+                        "#3498db",
+                        "#1abc9c",
+                        "#f39c12",
+                        "#9b59b6",
+                        "#e74c3c"
+                    ]
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+
+                    datalabels: {
+                        display: context =>
+                            context.dataset.data[context.dataIndex] >= 4,
+
+                        color: "#ffffff",
+
+                        formatter: value =>
+                            value.toFixed(1) + "%",
+
+                        font: {
+                            weight: "bold",
+                            size: 13
+                        }
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: context =>
+                                context.label + ": " +
+                                context.raw.toFixed(1) + "%"
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+    </script>
+
+</body>
+</html>
+

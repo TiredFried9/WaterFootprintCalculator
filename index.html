@@ -1,0 +1,575 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Water Footprint Calculator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #edf7fa;
+            color: #243746;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #126783, #1ba6a3);
+            color: white;
+            text-align: center;
+            padding: 55px 20px 65px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .header::before {
+                content: "";
+                position: absolute;
+                width: 260px;
+                height: 260px;
+                border: 2px solid rgba(255, 255, 255, 0.15);
+                border-radius: 50%;
+                top: -130px;
+                left: -80px;
+            }
+
+            .header::after {
+                content: "";
+                position: absolute;
+                width: 350px;
+                height: 350px;
+                border: 2px solid rgba(255, 255, 255, 0.12);
+                border-radius: 50%;
+                bottom: -250px;
+                right: -100px;
+            }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+            .logo svg {
+                width: 55px;
+                height: 55px;
+                fill: none;
+                stroke: white;
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+        .header h1 {
+            font-size: 38px;
+            margin: 10px 0;
+        }
+
+        .header p {
+            font-size: 17px;
+            color: #e0f7fa;
+            line-height: 1.6;
+            margin: 10px auto;
+            max-width: 600px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: -30px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .calculator {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 80, 110, 0.10);
+        }
+
+        .section-title {
+            color: #176b87;
+            font-size: 25px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #607d8b;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .input-card {
+            background: #f1f9fc;
+            border: 1px solid #d7edf3;
+            border-radius: 12px;
+            padding: 22px;
+            transition: 0.2s;
+        }
+
+            .input-card:hover {
+                border-color: #1ba6a3;
+                box-shadow: 0 4px 15px rgba(0, 120, 140, 0.10);
+                transform: translateY(-2px);
+            }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .card-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: #d9f1f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .card-heading h3 {
+            margin: 0;
+            color: #176b87;
+            font-size: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #496573;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 13px;
+            font-size: 16px;
+            border: 1px solid #c9dfe8;
+            border-radius: 8px;
+            background: white;
+            color: #243746;
+            outline: none;
+        }
+
+            input[type="number"]:focus,
+            select:focus {
+                border-color: #1ba6a3;
+                box-shadow: 0 0 0 3px rgba(27, 166, 163, 0.12);
+            }
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+            .field:last-child {
+                margin-bottom: 0;
+            }
+
+        .rate-note {
+            color: #64818c;
+            font-size: 12px;
+            margin: 10px 0 0;
+            line-height: 1.5;
+        }
+
+        .calculate-button {
+            width: 100%;
+            background: linear-gradient(135deg, #176b87, #159c9b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 17px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: 0.2s;
+        }
+
+            .calculate-button:hover {
+                background: linear-gradient(135deg, #12536a, #117c7b);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 100, 120, 0.20);
+            }
+
+        .footer {
+            text-align: center;
+            padding: 15px 20px 35px;
+            color: #64818c;
+            font-size: 14px;
+        }
+
+            .footer p {
+                margin: 5px;
+            }
+
+        @media (max-width: 650px) {
+            .header {
+                padding: 40px 20px 60px;
+            }
+
+                .header h1 {
+                    font-size: 29px;
+                }
+
+                .header p {
+                    font-size: 15px;
+                }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .calculator {
+                padding: 22px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="logo">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2 C12 2 4 10 4 15
+                         A8 8 0 0 0 20 15
+                         C20 10 12 2 12 2Z">
+                </path>
+                <path d="M8 15 C8 17 9 18 11 19"></path>
+            </svg>
+        </div>
+
+        <h1>Water Footprint Calculator</h1>
+
+        <p>
+            Every Drop Counts.
+            Discover your daily water footprint and
+            learn how small changes can help conserve water.
+        </p>
+
+    </header>
+
+    <main class="container">
+
+        <div class="calculator">
+
+            <h2 class="section-title">
+                Calculate Your Water Usage
+            </h2>
+
+            <p class="description">
+                Enter your typical water-use habits and choose
+                the water consumption rate that best matches
+                your appliances and activities.
+            </p>
+
+            <form action="/calculate" method="POST">
+
+                <div class="input-grid">
+
+                    <!-- Toilet -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">🚽</div>
+                            <h3>Toilet Flushes</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="toilet_flushes">
+                                How many times do you flush per day?
+                            </label>
+
+                            <input type="number"
+                                   id="toilet_flushes"
+                                   name="toilet_flushes"
+                                   min="0"
+                                   step="1"
+                                   placeholder="e.g. 5"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="toilet_rate">
+                                Water used per flush
+                            </label>
+
+                            <select id="toilet_rate"
+                                    name="toilet_rate"
+                                    required>
+                                <option value="4.8">4.8 L/flush</option>
+                                <option value="6" selected>6.0 L/flush</option>
+                                <option value="6.5">6.5 L/flush</option>
+                                <option value="7.5">7.5 L/flush</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Shower -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">🚿</div>
+                            <h3>Showering</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="shower_minutes">
+                                How many minutes do you shower per day?
+                            </label>
+
+                            <input type="number"
+                                   id="shower_minutes"
+                                   name="shower_minutes"
+                                   min="0"
+                                   step="0.1"
+                                   placeholder="e.g. 15"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="shower_rate">
+                                Shower water flow rate
+                            </label>
+
+                            <select id="shower_rate"
+                                    name="shower_rate"
+                                    required>
+                                <option value="6">6.0 L/min</option>
+                                <option value="7.5">7.5 L/min</option>
+                                <option value="9.5" selected>9.5 L/min</option>
+                                <option value="12">12.0 L/min</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Brushing Teeth -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">🪥</div>
+                            <h3>Brushing Teeth</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="brushing_minutes">
+                                How many minutes do you brush per day?
+                            </label>
+
+                            <input type="number"
+                                   id="brushing_minutes"
+                                   name="brushing_minutes"
+                                   min="0"
+                                   step="0.1"
+                                   placeholder="e.g. 2"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="brushing_rate">
+                                Average water used per minute
+                            </label>
+
+                            <select id="brushing_rate"
+                                    name="brushing_rate"
+                                    required>
+                                <option value="0.5">0.5 L/min - Tap mostly off</option>
+                                <option value="2">2.0 L/min - Low usage</option>
+                                <option value="6">6.0 L/min - Moderate flow</option>
+                                <option value="10" selected>10.0 L/min - Running tap</option>
+                            </select>
+                        </div>
+
+                        <p class="rate-note">
+                            Choose a lower rate if you turn off
+                            the faucet while brushing.
+                        </p>
+
+                    </div>
+
+                    <!-- Laundry -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">🧺</div>
+                            <h3>Laundry</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="laundry_loads">
+                                How many laundry loads per week?
+                            </label>
+
+                            <input type="number"
+                                   id="laundry_loads"
+                                   name="laundry_loads"
+                                   min="0"
+                                   step="1"
+                                   placeholder="e.g. 2"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="laundry_rate">
+                                Water used per laundry load
+                            </label>
+
+                            <select id="laundry_rate"
+                                    name="laundry_rate"
+                                    required>
+                                <option value="40">40 L/load</option>
+                                <option value="57" selected>57 L/load</option>
+                                <option value="75">75 L/load</option>
+                                <option value="100">100 L/load</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Cooking and Dishwashing -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">🍳</div>
+                            <h3>Cooking &amp; Dishwashing</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="cooking_times">
+                                How many cooking and dishwashing
+                                sessions per day?
+                            </label>
+
+                            <input type="number"
+                                   id="cooking_times"
+                                   name="cooking_times"
+                                   min="0"
+                                   step="1"
+                                   placeholder="e.g. 2"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="cooking_rate">
+                                Water used per session
+                            </label>
+
+                            <select id="cooking_rate"
+                                    name="cooking_rate"
+                                    required>
+                                <option value="15">15 L/session</option>
+                                <option value="20">20 L/session</option>
+                                <option value="30" selected>30 L/session</option>
+                                <option value="40">40 L/session</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Drinking Water -->
+
+                    <div class="input-card">
+
+                        <div class="card-heading">
+                            <div class="card-icon">💧</div>
+                            <h3>Drinking Water</h3>
+                        </div>
+
+                        <div class="field">
+                            <label for="drinking_refills">
+                                How many bottles or refills per day?
+                            </label>
+
+                            <input type="number"
+                                   id="drinking_refills"
+                                   name="drinking_refills"
+                                   min="0"
+                                   step="1"
+                                   placeholder="e.g. 2"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="drinking_rate">
+                                Water volume per refill
+                            </label>
+
+                            <select id="drinking_rate"
+                                    name="drinking_rate"
+                                    required>
+                                <option value="0.5">0.5 L/refill</option>
+                                <option value="1">1.0 L/refill</option>
+                                <option value="1.5" selected>1.5 L/refill</option>
+                                <option value="2">2.0 L/refill</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button type="submit"
+                        class="calculate-button">
+                    Calculate My Water Use &rarr;
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>💧 Every Drop Counts</p>
+        <p>
+            Water Footprint Calculator |
+            Promoting Water Conservation
+        </p>
+    </footer>
+
+</body>
+</html>
