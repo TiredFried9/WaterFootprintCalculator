@@ -1,24 +1,22 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2O OH NO! | Water Usage Results</title>
 
-    <title>Your Water Usage Results</title>
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Chart Data Labels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f8fc;
+            background: #f2f8fc;
             margin: 0;
             padding: 20px;
             color: #243746;
@@ -31,6 +29,19 @@
             padding: 30px;
             border-radius: 12px;
         }
+
+        .website-logo {
+            text-align: center;
+            margin: 10px auto 25px;
+        }
+
+            .website-logo img {
+                display: block;
+                width: 280px;
+                max-width: 100%;
+                height: auto;
+                margin: auto;
+            }
 
         h1 {
             text-align: center;
@@ -89,7 +100,7 @@
         }
 
         th {
-            background-color: #dceff5;
+            background: #dceff5;
         }
 
         .chart-container {
@@ -103,7 +114,102 @@
             height: 400px;
         }
 
-        /* Water Saving Recommendations */
+        .perspective-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .perspective-card {
+            background: #f1f8fc;
+            border: 1px solid #d7eaf2;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .perspective-icon {
+            font-size: 32px;
+        }
+
+        .perspective-card h3 {
+            color: #176b87;
+        }
+
+        .perspective-value {
+            font-size: 29px;
+            font-weight: bold;
+            color: #16834a;
+            margin: 12px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .perspective-card p {
+            color: #526b78;
+            line-height: 1.6;
+        }
+
+        .perspective-interactive {
+            background: #e6f5fa;
+            padding: 22px;
+            border-radius: 12px;
+            margin-top: 22px;
+        }
+
+            .perspective-interactive h3 {
+                color: #176b87;
+            }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #b9d5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .interactive-result {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+            .interactive-result strong {
+                display: block;
+                font-size: 28px;
+                color: #176b87;
+                margin: 10px 0;
+            }
+
+        .progress-track {
+            background: #d0e2e9;
+            border-radius: 20px;
+            height: 18px;
+            overflow: hidden;
+            margin-top: 18px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #1abc9c, #176b87);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-label {
+            text-align: center;
+            font-size: 14px;
+            color: #526b78;
+            margin-top: 10px;
+        }
+
+        .perspective-note {
+            font-size: 13px;
+            color: #607580;
+            line-height: 1.6;
+            margin-top: 18px;
+        }
 
         .recommendations {
             display: grid;
@@ -113,7 +219,7 @@
         }
 
         .tip {
-            background-color: #f1f8fc;
+            background: #f1f8fc;
             border-left: 5px solid #176b87;
             padding: 18px;
             border-radius: 8px;
@@ -144,10 +250,7 @@
                 background: #12536a;
             }
 
-        /* layout */
-
         @media (max-width: 600px) {
-
             body {
                 padding: 10px;
             }
@@ -156,7 +259,8 @@
                 padding: 15px;
             }
 
-            .recommendations {
+            .recommendations,
+            .perspective-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -167,54 +271,61 @@
             .pie-container {
                 height: 350px;
             }
+
+            th, td {
+                padding: 9px;
+                font-size: 14px;
+            }
+
+            .website-logo img {
+                width: 250px;
+            }
         }
     </style>
-
 </head>
 
 <body>
+    <main class="container">
 
-    <div class="container">
+        <!-- NEW H2O OH NO! LOGO -->
+        <div class="website-logo">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='logo.png') }}"
+                     alt="H2O OH NO! Faucet Logo">
+            </a>
+        </div>
 
         <h1>Your Water Usage Results</h1>
 
-        <!-- Final Results -->
-
+        <!-- Summary -->
         <div class="summary">
-
             <h2>Total Water Use Per Week</h2>
             <strong>{{ weekly_total }} L</strong>
 
             <h2>Average Water Use Per Day</h2>
             <strong>{{ daily_average }} L/day</strong>
-
         </div>
 
-
-        <!-- Comparison -->
-
+        <!-- Metro Vancouver Comparison -->
         <h2>How Does Your Water Usage Compare?</h2>
 
         <div class="comparison">
-
             <p>
                 The residential water consumption benchmark
-                used for Metro Vancouver is approximately
+                used for Metro Vancouver in this project is
+                approximately
                 <strong>{{ metro_average }} litres per person per day</strong>.
             </p>
 
             {% if comparison == "less" %}
-
             <p>
                 Your estimated daily water usage is
                 <strong>{{ daily_average }} L/day</strong>.
             </p>
-
             <p class="less">
                 You use approximately {{ difference }} litres
                 LESS water per day than the benchmark.
             </p>
-
             <p>
                 That is approximately
                 <strong>{{ percentage_difference }}% less</strong>
@@ -222,17 +333,14 @@
             </p>
 
             {% elif comparison == "more" %}
-
             <p>
                 Your estimated daily water usage is
                 <strong>{{ daily_average }} L/day</strong>.
             </p>
-
             <p class="more">
                 You use approximately {{ difference }} litres
                 MORE water per day than the benchmark.
             </p>
-
             <p>
                 That is approximately
                 <strong>{{ percentage_difference }}% more</strong>
@@ -240,90 +348,156 @@
             </p>
 
             {% else %}
-
             <p class="equal">
                 Your estimated daily water usage is
                 {{ daily_average }} L/day,
                 which is equal to the benchmark.
             </p>
-
             {% endif %}
 
             <p>
                 <small>
-                    Note: This calculator estimates selected
-                    household activities and may not include
-                    all residential water uses.
+                    This calculator estimates selected household
+                    activities and may not include all residential
+                    water uses.
                 </small>
             </p>
-
         </div>
 
-
         <!-- Weekly Breakdown -->
-
         <h2>Weekly Water Usage Breakdown</h2>
 
         <table>
-
             <tr>
                 <th>Category</th>
                 <th>Water Used (L/week)</th>
             </tr>
-
             <tr>
                 <td>Toilet Flushes</td>
                 <td>{{ toilet }}</td>
             </tr>
-
             <tr>
-                <td>Shower & Brushing Teeth</td>
+                <td>Shower &amp; Brushing Teeth</td>
                 <td>{{ shower_brushing }}</td>
             </tr>
-
             <tr>
                 <td>Laundry</td>
                 <td>{{ laundry }}</td>
             </tr>
-
             <tr>
-                <td>Cooking & Dishwashing</td>
+                <td>Cooking &amp; Dishwashing</td>
                 <td>{{ cooking }}</td>
             </tr>
-
             <tr>
                 <td>Drinking Water</td>
                 <td>{{ drinking }}</td>
             </tr>
-
         </table>
 
-
-        <!-- Bar Graph -->
-
+        <!-- Charts -->
         <h2>Percentage of Water Usage by Category</h2>
-
         <div class="chart-container">
             <canvas id="barChart"></canvas>
         </div>
 
-
-        <!-- Pie Chart -->
-
         <h2>Water Usage Distribution</h2>
-
         <div class="chart-container pie-container">
             <canvas id="pieChart"></canvas>
         </div>
 
+        <!-- Water Usage in Perspective -->
+        <h2>Your Water Usage in Perspective</h2>
 
-        <!-- Water Saving Recommendations -->
+        <p>
+            See how your estimated weekly water consumption
+            compares with familiar water volumes.
+        </p>
 
+        <div class="perspective-grid">
+
+            <div class="perspective-card">
+                <div class="perspective-icon">🏊</div>
+                <h3>Swimming Pool</h3>
+                <div class="perspective-value" id="poolValue">0%</div>
+                <p>Of a 25,000-litre backyard swimming pool.</p>
+            </div>
+
+            <div class="perspective-card">
+                <div class="perspective-icon">🌱</div>
+                <h3>Gardening</h3>
+                <div class="perspective-value" id="gardenValue">0</div>
+                <p>
+                    Equivalent to this many 10-litre watering cans.
+                </p>
+            </div>
+
+            <div class="perspective-card">
+                <div class="perspective-icon">🛁</div>
+                <h3>Bathtubs</h3>
+                <div class="perspective-value" id="bathtubValue">0</div>
+                <p>
+                    Equivalent to this many 150-litre bathtubs.
+                </p>
+            </div>
+
+            <div class="perspective-card">
+                <div class="perspective-icon">⛳</div>
+                <h3>Golf Course Irrigation</h3>
+                <div class="perspective-value" id="golfValue">0%</div>
+                <p>
+                    Of a hypothetical 500,000-litre
+                    golf-course irrigation day.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Interactive Comparison -->
+        <div class="perspective-interactive">
+            <h3>Explore Your Water Usage</h3>
+
+            <p>
+                Select a comparison to explore how much water
+                your weekly consumption represents.
+            </p>
+
+            <label for="comparisonSelect">
+                <strong>Compare your water usage with:</strong>
+            </label>
+
+            <select id="comparisonSelect">
+                <option value="pool">Backyard Swimming Pool</option>
+                <option value="garden">Garden Watering Cans</option>
+                <option value="bathtub">Bathtubs</option>
+                <option value="golf">Golf Course Irrigation</option>
+            </select>
+
+            <div class="interactive-result">
+                <p>Your weekly water consumption equals:</p>
+                <strong id="interactiveValue">0</strong>
+                <p id="interactiveDescription"></p>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <p class="progress-label" id="progressLabel"></p>
+        </div>
+
+        <p class="perspective-note">
+            These are illustrative volume comparisons, not
+            additional water use. The swimming pool, watering
+            can and bathtub capacities are examples. The
+            golf-course irrigation volume is hypothetical,
+            not a verified average. Actual amounts vary.
+        </p>
+
+        <!-- Water Saving Tips -->
         <h2>8 Ways to Reduce Your Water Usage</h2>
 
         <p>
-            Here are some practical ways to reduce your
-            daily water consumption and help conserve water
+            Here are some practical ways to conserve water
             in Metro Vancouver.
         </p>
 
@@ -332,18 +506,17 @@
             <div class="tip">
                 <h3>1. Take Shorter Showers</h3>
                 <p>
-                    Reduce shower time from 20 minutes to 15 minutes.
-                    Install a water-efficient showerhead to reduce
-                    water consumption further.
+                    Reduce shower time from 20 minutes to
+                    15 minutes. Install a water-efficient
+                    showerhead to save even more water.
                 </p>
             </div>
 
             <div class="tip">
                 <h3>2. Turn Off Taps When Not in Use</h3>
                 <p>
-                    Turn off the faucet while brushing your teeth,
-                    shaving, or washing your face instead of
-                    leaving water running.
+                    Turn off the faucet while brushing your
+                    teeth, shaving, or washing your face.
                 </p>
             </div>
 
@@ -358,8 +531,8 @@
             <div class="tip">
                 <h3>4. Wash Full Loads of Laundry</h3>
                 <p>
-                    Run the washing machine only when you have
-                    a full load, or use the appropriate water-level
+                    Run the washing machine with full loads,
+                    or choose the appropriate water-level
                     setting for smaller loads.
                 </p>
             </div>
@@ -368,8 +541,8 @@
                 <h3>5. Save Water While Washing Dishes</h3>
                 <p>
                     Run the dishwasher with full loads.
-                    When washing by hand, fill the sink with
-                    water instead of continuously running the tap.
+                    When washing by hand, fill the sink
+                    rather than leaving the tap running.
                 </p>
             </div>
 
@@ -377,17 +550,15 @@
                 <h3>6. Fix Leaking Faucets and Toilets</h3>
                 <p>
                     Check for dripping taps, running toilets,
-                    and leaking pipes. Repairing leaks prevents
-                    unnecessary water waste.
+                    and leaking pipes. Repair leaks promptly.
                 </p>
             </div>
 
             <div class="tip">
                 <h3>7. Collect Rainwater for Gardening</h3>
                 <p>
-                    Use a rain barrel to collect rainwater
-                    for watering outdoor plants instead of
-                    using treated drinking water.
+                    Use a rain barrel to collect water
+                    for outdoor plants where permitted.
                 </p>
             </div>
 
@@ -395,199 +566,247 @@
                 <h3>8. Reduce Outdoor Watering</h3>
                 <p>
                     Use drought-tolerant plants, mulch,
-                    and drip irrigation. Follow Metro Vancouver's
-                    seasonal lawn-watering restrictions.
+                    and drip irrigation. Follow seasonal
+                    lawn-watering restrictions.
                 </p>
             </div>
 
         </div>
 
-
-        <!-- Calculate Again -->
-
-        <a href="/" class="button">
+        <a href="{{ url_for('home') }}" class="button">
             Calculate Again
         </a>
 
-    </div>
-
-
-    <!-- JavaScript Charts -->
+    </main>
 
     <script>
+        // Data received from Flask
+        const weeklyWater = {{ weekly_total | tojson }};
 
-    // Category names
-    const categories = [
-        "Toilet",
-        "Shower & Brushing",
-        "Laundry",
-        "Cooking & Dishwashing",
-        "Drinking"
-    ];
+        const categories = [
+            "Toilet",
+            "Shower & Brushing",
+            "Laundry",
+            "Cooking & Dishwashing",
+            "Drinking"
+        ];
 
-    // Weekly water usage from Python
-    const waterData = [
-        {{ toilet | tojson }},
-        {{ shower_brushing | tojson }},
-        {{ laundry | tojson }},
-        {{ cooking | tojson }},
-        {{ drinking | tojson }}
-    ];
+        const waterData = [
+            {{ toilet | tojson }},
+            {{ shower_brushing | tojson }},
+            {{ laundry | tojson }},
+            {{ cooking | tojson }},
+            {{ drinking | tojson }}
+        ];
 
-    // Total water usage
-    const totalWater = waterData.reduce(
-        (total, value) => total + value,
-        0
-    );
+        const totalWater = waterData.reduce(
+            (sum, value) => sum + value,
+            0
+        );
 
-    // Percentage of each category
-    const percentageData = waterData.map(
-        value => totalWater > 0
-            ? (value / totalWater) * 100
-            : 0
-    );
+        const percentageData = waterData.map(
+            value => totalWater > 0
+                ? (value / totalWater) * 100
+                : 0
+        );
 
-    // Register chart labels plugin
-    if (typeof ChartDataLabels !== "undefined") {
-        Chart.register(ChartDataLabels);
-    }
+        const chartColors = [
+            "#3498db",
+            "#1abc9c",
+            "#f39c12",
+            "#9b59b6",
+            "#e74c3c"
+        ];
 
-    // Bar graph
-    new Chart(
-        document.getElementById("barChart"),
-        {
-            type: "bar",
-
-            data: {
-                labels: categories,
-
-                datasets: [{
-                    label: "Water Usage (%)",
-                    data: percentageData,
-                    backgroundColor: [
-                        "#3498db",
-                        "#1abc9c",
-                        "#f39c12",
-                        "#9b59b6",
-                        "#e74c3c"
-                    ]
-                }]
+        // Water comparison references
+        const comparisonOptions = {
+            pool: {
+                volume: 25000,
+                label: "backyard swimming pool"
             },
+            garden: {
+                volume: 10,
+                label: "10-litre watering cans"
+            },
+            bathtub: {
+                volume: 150,
+                label: "150-litre bathtubs"
+            },
+            golf: {
+                volume: 500000,
+                label: "hypothetical golf-course irrigation day"
+            }
+        };
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+        function formatNumber(number, digits = 1) {
+            return number.toLocaleString("en-CA", {
+                maximumFractionDigits: digits
+            });
+        }
 
-                layout: {
-                    padding: {
-                        top: 25
-                    }
-                },
+        // Update comparison cards
+        document.getElementById("poolValue").textContent =
+            formatNumber(weeklyWater / 25000 * 100, 2) + "%";
 
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
+        document.getElementById("gardenValue").textContent =
+            formatNumber(weeklyWater / 10);
 
-                        title: {
-                            display: true,
-                            text: "Percentage (%)"
+        document.getElementById("bathtubValue").textContent =
+            formatNumber(weeklyWater / 150, 2);
+
+        document.getElementById("golfValue").textContent =
+            formatNumber(weeklyWater / 500000 * 100, 3) + "%";
+
+        function updateComparison() {
+            const selected =
+                document.getElementById("comparisonSelect").value;
+
+            const option = comparisonOptions[selected];
+            const equivalent = weeklyWater / option.volume;
+            const percentage = equivalent * 100;
+
+            const result =
+                document.getElementById("interactiveValue");
+
+            const description =
+                document.getElementById("interactiveDescription");
+
+            const progress =
+                document.getElementById("progressFill");
+
+            const progressLabel =
+                document.getElementById("progressLabel");
+
+            if (selected === "pool" || selected === "golf") {
+                result.textContent =
+                    formatNumber(percentage, 3) + "%";
+
+                description.textContent =
+                    "of one " + option.label;
+            } else {
+                result.textContent =
+                    formatNumber(equivalent, 2);
+
+                description.textContent = option.label;
+            }
+
+            progress.style.width =
+                Math.min(Math.max(percentage, 0), 100) + "%";
+
+            progressLabel.textContent =
+                formatNumber(percentage, 2) +
+                "% of one reference volume";
+        }
+
+        document.getElementById("comparisonSelect")
+            .addEventListener("change", updateComparison);
+
+        updateComparison();
+
+        // Charts
+        if (typeof Chart !== "undefined") {
+
+            if (typeof ChartDataLabels !== "undefined") {
+                Chart.register(ChartDataLabels);
+            }
+
+            new Chart(
+                document.getElementById("barChart"),
+                {
+                    type: "bar",
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            label: "Water Usage (%)",
+                            data: percentageData,
+                            backgroundColor: chartColors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: { top: 25 }
                         },
-
-                        ticks: {
-                            callback: value => value + "%"
-                        }
-                    }
-                },
-
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-
-                    datalabels: {
-                        display: true,
-                        anchor: "end",
-                        align: "end",
-                        formatter: value =>
-                            value.toFixed(1) + "%",
-                        font: {
-                            weight: "bold"
-                        }
-                    },
-
-                    tooltip: {
-                        callbacks: {
-                            label: context =>
-                                context.raw.toFixed(1) + "%"
-                        }
-                    }
-                }
-            }
-        }
-    );
-
-
-    // Pie Chart
-    new Chart(
-        document.getElementById("pieChart"),
-        {
-            type: "pie",
-
-            data: {
-                labels: categories,
-
-                datasets: [{
-                    data: percentageData,
-
-                    backgroundColor: [
-                        "#3498db",
-                        "#1abc9c",
-                        "#f39c12",
-                        "#9b59b6",
-                        "#e74c3c"
-                    ]
-                }]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-
-                plugins: {
-                    legend: {
-                        position: "bottom"
-                    },
-
-                    datalabels: {
-                        display: context =>
-                            context.dataset.data[context.dataIndex] >= 4,
-
-                        color: "#ffffff",
-
-                        formatter: value =>
-                            value.toFixed(1) + "%",
-
-                        font: {
-                            weight: "bold",
-                            size: 13
-                        }
-                    },
-
-                    tooltip: {
-                        callbacks: {
-                            label: context =>
-                                context.label + ": " +
-                                context.raw.toFixed(1) + "%"
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: "Percentage (%)"
+                                },
+                                ticks: {
+                                    callback: value => value + "%"
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                display: true,
+                                anchor: "end",
+                                align: "end",
+                                formatter: value =>
+                                    value.toFixed(1) + "%",
+                                font: { weight: "bold" }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context =>
+                                        context.raw.toFixed(1) + "%"
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-    );
+            );
 
+            new Chart(
+                document.getElementById("pieChart"),
+                {
+                    type: "pie",
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            data: percentageData,
+                            backgroundColor: chartColors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: "bottom" },
+                            datalabels: {
+                                display: context =>
+                                    context.dataset.data[
+                                        context.dataIndex
+                                    ] >= 4,
+                                color: "#ffffff",
+                                formatter: value =>
+                                    value.toFixed(1) + "%",
+                                font: {
+                                    weight: "bold",
+                                    size: 13
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: context =>
+                                        context.label + ": " +
+                                        context.raw.toFixed(1) + "%"
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+        }
     </script>
-
 </body>
 </html>
+
+
+
 
