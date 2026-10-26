@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H2O OH NO! | Water Footprint Calculator</title>
+
+    <title>H2O OH NO! Water Footprint Calculator</title>
 
     <style>
         * {
@@ -25,22 +26,18 @@
             padding: 30px;
             background: white;
             border-radius: 14px;
+            box-shadow: 0 5px 24px #c8dce34d;
         }
 
-        .website-logo {
-            text-align: center;
-            margin: 10px auto 25px;
+        .logo {
+            display: block;
+            width: 280px;
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto 25px;
         }
 
-            .website-logo img {
-                display: block;
-                width: 300px;
-                max-width: 100%;
-                height: auto;
-                margin: auto;
-            }
-
-        h1, h2 {
+        h1, h2, h3 {
             color: #176b87;
         }
 
@@ -61,10 +58,9 @@
             border-radius: 10px;
         }
 
-            .activity h3 {
-                color: #176b87;
-                margin-top: 0;
-            }
+        .activity h3 {
+            margin-top: 0;
+        }
 
         .input-row {
             display: grid;
@@ -99,9 +95,9 @@
             cursor: pointer;
         }
 
-            button:hover {
-                background: #12536a;
-            }
+        button:hover {
+            background: #12536a;
+        }
 
         .note {
             font-size: 13px;
@@ -118,7 +114,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .website-logo img {
+            .logo {
                 width: 250px;
             }
         }
@@ -126,228 +122,168 @@
 </head>
 
 <body>
-    <main class="container">
 
-        <!-- NEW H2O OH NO! LOGO -->
-        <div class="website-logo">
-            <img src="{{ url_for('static', filename='logo.png') }}"
-                 alt="H2O OH NO! Faucet Logo">
-        </div>
+<main class="container">
 
-        <h1>Calculate Your Water Usage</h1>
+    <img
+        class="logo"
+        src="{{ url_for('static', filename='logo.png') }}"
+        alt="H2O OH NO! Logo"
+    >
 
-        <p class="intro">
-            Discover how much water you use during everyday
-            activities. Enter your habits and choose the
-            water consumption rates that best match your household.
-        </p>
+    <h1>Calculate Your Water Usage</h1>
 
-        <form action="{{ url_for('calculate') }}" method="POST">
+    <p class="intro">
+        Discover how much water you consume during everyday
+        activities. Enter your habits and calculate your
+        weekly water footprint.
 
-            <!-- Toilet -->
-            <div class="activity">
-                <h3>Toilet Flushes</h3>
+        You can also track your water usage over multiple
+        weeks and download your results as a PDF report.
+    </p>
 
-                <div class="input-row">
-                    <div>
-                        <label for="toilet_flushes">
-                            Flushes per day
-                        </label>
-                        <input type="number"
-                               id="toilet_flushes"
-                               name="toilet_flushes"
-                               min="0"
-                               step="1"
-                               value="5"
-                               required>
-                    </div>
+    <form action="{{ url_for('calculate') }}" method="POST">
 
-                    <div>
-                        <label for="toilet_rate">
-                            Litres per flush
-                        </label>
-                        <select id="toilet_rate" name="toilet_rate">
-                            <option value="4.8">4.8 L</option>
-                            <option value="6.0" selected>6.0 L</option>
-                            <option value="6.5">6.5 L</option>
-                            <option value="7.5">7.5 L</option>
-                        </select>
-                    </div>
+        {% set activities = [
+            (
+                'toilet',
+                'Toilet Flushes',
+                'toilet_flushes',
+                'Flushes per day',
+                'toilet_rate',
+                'Litres per flush',
+                5,
+                6.0
+            ),
+            (
+                'shower',
+                'Showering',
+                'shower_minutes',
+                'Minutes per day',
+                'shower_rate',
+                'Litres per minute',
+                10,
+                9.5
+            ),
+            (
+                'brushing',
+                'Brushing Teeth',
+                'brushing_minutes',
+                'Minutes per day',
+                'brushing_rate',
+                'Litres per minute',
+                2,
+                10.0
+            ),
+            (
+                'laundry',
+                'Laundry',
+                'laundry_loads',
+                'Loads per week',
+                'laundry_rate',
+                'Litres per load',
+                3,
+                57
+            ),
+            (
+                'cooking',
+                'Cooking and Dishwashing',
+                'cooking_times',
+                'Sessions per day',
+                'cooking_rate',
+                'Litres per session',
+                2,
+                30
+            ),
+            (
+                'drinking',
+                'Drinking Water',
+                'drinking_refills',
+                'Bottle refills per day',
+                'drinking_rate',
+                'Litres per refill',
+                3,
+                1.0
+            )
+        ] %}
+
+        {% for key, title, count_name, count_label,
+               rate_name, rate_label, default_count,
+               default_rate in activities %}
+
+        <section class="activity">
+
+            <h3>{{ title }}</h3>
+
+            <div class="input-row">
+
+                <div>
+                    <label for="{{ count_name }}">
+                        {{ count_label }}
+                    </label>
+
+                    <input
+                        type="number"
+                        id="{{ count_name }}"
+                        name="{{ count_name }}"
+                        min="0"
+                        max="10000"
+                        step="{{ '0.1' if key in ['shower', 'brushing'] else '1' }}"
+                        value="{{ default_count }}"
+                        required
+                    >
                 </div>
+
+                <div>
+                    <label for="{{ rate_name }}">
+                        {{ rate_label }}
+                    </label>
+
+                    <select
+                        id="{{ rate_name }}"
+                        name="{{ rate_name }}"
+                    >
+
+                        {% for rate in rates[key] %}
+
+                        <option
+                            value="{{ rate }}"
+                            {% if rate == default_rate %}selected{% endif %}
+                        >
+                            {{ rate }} L
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
             </div>
 
-            <!-- Shower -->
-            <div class="activity">
-                <h3>Showering</h3>
+        </section>
 
-                <div class="input-row">
-                    <div>
-                        <label for="shower_minutes">
-                            Minutes per day
-                        </label>
-                        <input type="number"
-                               id="shower_minutes"
-                               name="shower_minutes"
-                               min="0"
-                               step="0.1"
-                               value="10"
-                               required>
-                    </div>
+        {% endfor %}
 
-                    <div>
-                        <label for="shower_rate">
-                            Litres per minute
-                        </label>
-                        <select id="shower_rate" name="shower_rate">
-                            <option value="6.0">6.0 L</option>
-                            <option value="7.5">7.5 L</option>
-                            <option value="9.5" selected>9.5 L</option>
-                            <option value="12.0">12.0 L</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+        <button type="submit">
+            Calculate My Water Usage
+        </button>
 
-            <!-- Brushing -->
-            <div class="activity">
-                <h3>Brushing Teeth</h3>
+    </form>
 
-                <div class="input-row">
-                    <div>
-                        <label for="brushing_minutes">
-                            Minutes per day
-                        </label>
-                        <input type="number"
-                               id="brushing_minutes"
-                               name="brushing_minutes"
-                               min="0"
-                               step="0.1"
-                               value="2"
-                               required>
-                    </div>
+    <p class="note">
+        This calculator estimates water usage for selected
+        household activities. It does not include every
+        possible source of household water consumption.
+    </p>
 
-                    <div>
-                        <label for="brushing_rate">
-                            Litres per minute
-                        </label>
-                        <select id="brushing_rate" name="brushing_rate">
-                            <option value="0.5">0.5 L</option>
-                            <option value="2.0">2.0 L</option>
-                            <option value="6.0">6.0 L</option>
-                            <option value="10.0" selected>10.0 L</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+    <p class="note">
+        Weekly tracking information is stored in your
+        browser. It will remain available when you return
+        using the same browser unless you clear the saved data.
+    </p>
 
-            <!-- Laundry -->
-            <div class="activity">
-                <h3>Laundry</h3>
+</main>
 
-                <div class="input-row">
-                    <div>
-                        <label for="laundry_loads">
-                            Loads per week
-                        </label>
-                        <input type="number"
-                               id="laundry_loads"
-                               name="laundry_loads"
-                               min="0"
-                               step="1"
-                               value="3"
-                               required>
-                    </div>
-
-                    <div>
-                        <label for="laundry_rate">
-                            Litres per load
-                        </label>
-                        <select id="laundry_rate" name="laundry_rate">
-                            <option value="40.0">40 L</option>
-                            <option value="57.0" selected>57 L</option>
-                            <option value="75.0">75 L</option>
-                            <option value="100.0">100 L</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cooking -->
-            <div class="activity">
-                <h3>Cooking and Dishwashing</h3>
-
-                <div class="input-row">
-                    <div>
-                        <label for="cooking_times">
-                            Sessions per day
-                        </label>
-                        <input type="number"
-                               id="cooking_times"
-                               name="cooking_times"
-                               min="0"
-                               step="1"
-                               value="2"
-                               required>
-                    </div>
-
-                    <div>
-                        <label for="cooking_rate">
-                            Litres per session
-                        </label>
-                        <select id="cooking_rate" name="cooking_rate">
-                            <option value="15.0">15 L</option>
-                            <option value="20.0">20 L</option>
-                            <option value="30.0" selected>30 L</option>
-                            <option value="40.0">40 L</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Drinking -->
-            <div class="activity">
-                <h3>Drinking Water</h3>
-
-                <div class="input-row">
-                    <div>
-                        <label for="drinking_refills">
-                            Bottle refills per day
-                        </label>
-                        <input type="number"
-                               id="drinking_refills"
-                               name="drinking_refills"
-                               min="0"
-                               step="1"
-                               value="3"
-                               required>
-                    </div>
-
-                    <div>
-                        <label for="drinking_rate">
-                            Litres per refill
-                        </label>
-                        <select id="drinking_rate" name="drinking_rate">
-                            <option value="0.5">0.5 L</option>
-                            <option value="1.0" selected>1.0 L</option>
-                            <option value="1.5">1.5 L</option>
-                            <option value="2.0">2.0 L</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit">
-                Calculate My Water Usage
-            </button>
-        </form>
-
-        <p class="note">
-            Results estimate direct water use for the
-            activities listed above. They do not include
-            every household water use or the water used
-            to produce food and goods.
-        </p>
-
-    </main>
 </body>
 </html>
+
